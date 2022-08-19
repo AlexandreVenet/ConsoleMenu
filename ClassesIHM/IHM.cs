@@ -14,10 +14,16 @@ namespace ConsoleMenu.ClassesIHM
 		#region Fields
 
 		/// <summary>
-		/// Conserver le choix utilisateur lors de la navigation. 
-		/// <br/> Valeur réinitialisée lors d'un choix d'option.
+		/// Le choix utilisateur lors de la navigation. 
+		/// <br/>Utilisée pour l'usage sans conserver la valeur.
 		/// </summary>
 		private int _userChoice;
+
+		/// <summary>
+		/// Le choix utilisateur lors de la navigation
+		/// <br/>Utilisée pour l'usage avec conservation de la valeur.
+		/// </summary>
+		private int _userChoiceDemarrer;
 
 		#endregion
 
@@ -44,6 +50,7 @@ namespace ConsoleMenu.ClassesIHM
 			Title("Application titre principal");
 
 			Console.WriteLine("Bienvenue ici !");
+			Console.WriteLine("A cet écran seulement, le menu conserve la valeur de l'option choisie.");
 
 			// Tableau d'options pour le menu
 			Option[] menuOptions =
@@ -55,7 +62,7 @@ namespace ConsoleMenu.ClassesIHM
 			};
 
 			// Le menu
-			Menu(menuOptions, ref _userChoice);
+			Menu(menuOptions, ref _userChoiceDemarrer, VarBehaviour.KeepValue);
 		}
 
 		private void Info()
@@ -178,16 +185,29 @@ namespace ConsoleMenu.ClassesIHM
 		/// <summary>
 		/// Créer un menu à partir d'un tableau d'options.
 		/// <br/>La navigation réécrit le menu à la position du curseur à chaque fois.
+		/// <br/>La variable de suivi est réinitialisée.
 		/// </summary>
 		/// <param name="menuOptions">Tableau d'options.</param>
 		/// <param name="currentChoice">Variable (en référence), conservant l'index de l'option choisie.</param>
 		private void Menu(Option[] menuOptions, ref int currentChoice)
 		{
+			Menu(menuOptions, ref currentChoice, VarBehaviour.ResetValue);
+		}
+
+		/// <summary>
+		/// Créer un menu à partir d'un tableau d'options.
+		/// <br/>La navigation réécrit le menu à la position du curseur à chaque fois.
+		/// </summary>
+		/// <param name="menuOptions">Tableau d'options.</param>
+		/// <param name="currentChoice">Variable (en référence), conservant l'index de l'option choisie.</param
+		/// <param name="varBehaviour">Que faire avec la variable de suivi ? Conserver ou réinitialiser la valeur.</param>
+		private void Menu(Option[] menuOptions, ref int currentChoice, VarBehaviour varBehaviour)
+		{
 			while (true)
 			{
 				// Connaître la position du curseur (tuple)
 
-				(int Left, int Top, int Size) cursorStart = (Console.CursorLeft, Console.CursorTop, Console.CursorSize);
+				(int Left, int Top) cursorStart = (Console.CursorLeft, Console.CursorTop);
 
 				// Afficher le menu
 
@@ -235,13 +255,22 @@ namespace ConsoleMenu.ClassesIHM
 					// Effacer (ici et pas après sinon non considéré)
 					Console.Clear();
 
-					// Conserver le choix utilisateur et réinitialiser ce dernier
-					int savedChoice = currentChoice;
-					currentChoice = 0;
-
-					// Lancer l'action avec le choix sauvegardé
-					menuOptions[savedChoice].p_action();
-
+					switch (varBehaviour)
+					{
+						case VarBehaviour.KeepValue:
+							// Lancer l'action sans toucher à la variable (sa valeur est donc inchangée)
+							menuOptions[currentChoice].p_action();
+							break;
+						case VarBehaviour.ResetValue:
+						default:
+							// Conserver le choix utilisateur et réinitialiser ce dernier
+							int savedChoice = currentChoice;
+							currentChoice = 0;
+							// Lancer l'action avec le choix sauvegardé ici
+							menuOptions[savedChoice].p_action();
+							break;
+					}
+					
 					// Arrêter ici
 					break;
 				}
