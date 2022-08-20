@@ -32,12 +32,12 @@ namespace ConsoleMenu.ClassesIHM
 		/// <summary>
 		/// Titre de l'option.
 		/// </summary>
-		public string? p_title { get => _title; set => _title = value; }
+		public string? Title { get => _title; set => _title = value; }
 
 		/// <summary>
 		/// Action de l'option (delegate).
 		/// </summary>
-		public Action p_action { get => _action; set => _action = value; }
+		public Action Action { get => _action; set => _action = value; }
 
 		#endregion
 
@@ -52,7 +52,7 @@ namespace ConsoleMenu.ClassesIHM
 		/// <param name="action">Callback de l'option (delegate).</param>
 		public Option(string title, Action action)
 		{
-			p_title = title;
+			Title = title;
 			_action = action;
 		}
 

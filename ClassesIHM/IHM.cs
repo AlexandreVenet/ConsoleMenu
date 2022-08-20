@@ -15,13 +15,13 @@ namespace ConsoleMenu.ClassesIHM
 
 		/// <summary>
 		/// Le choix utilisateur lors de la navigation. 
-		/// <br/>Utilisée pour l'usage sans conserver la valeur.
+		/// <br/>Utilisée pour usage par réinitialisation.
 		/// </summary>
 		private int _userChoice;
 
 		/// <summary>
 		/// Le choix utilisateur lors de la navigation
-		/// <br/>Utilisée pour l'usage avec conservation de la valeur.
+		/// <br/>Utilisée pour usage avec conservation de valeur.
 		/// </summary>
 		private int _userChoiceDemarrer;
 
@@ -50,7 +50,7 @@ namespace ConsoleMenu.ClassesIHM
 			Title("Application titre principal");
 
 			Console.WriteLine("Bienvenue ici !");
-			Console.WriteLine("A cet écran seulement, le menu conserve la valeur de l'option choisie.");
+			Console.WriteLine("Ce menu conserve la valeur de l'option choisie.");
 
 			// Tableau d'options pour le menu
 			Option[] menuOptions =
@@ -62,7 +62,7 @@ namespace ConsoleMenu.ClassesIHM
 			};
 
 			// Le menu
-			Menu(menuOptions, ref _userChoiceDemarrer, VarBehaviour.KeepValue);
+			Menu.Create(menuOptions, ref _userChoiceDemarrer, VarBehaviour.KeepValue);
 		}
 
 		private void Info()
@@ -72,7 +72,7 @@ namespace ConsoleMenu.ClassesIHM
 			Console.WriteLine("1 + 1 = 2");
 
 			// Menu à une seule option
-			Menu(new("Retour", Demarrer));
+			Menu.Create(new("Retour", Demarrer));
 		}
 
 		private void Process()
@@ -90,7 +90,7 @@ namespace ConsoleMenu.ClassesIHM
 			Console.WriteLine("Vous avez écrit : ");
 			Console.WriteLine($"\t{sb}");
 
-			Menu(new("Retour", Demarrer));
+			Menu.Create(new("Retour", Demarrer));
 		}
 
 		private void SousMenu()
@@ -110,7 +110,7 @@ namespace ConsoleMenu.ClassesIHM
 			Console.WriteLine("Maintenant, noter que le menu change et non le reste.");
 
 			// Autre syntaxe
-			Menu(new Option[]
+			Menu.Create(new Option[]
 			{
 				new("Une chose", Chose),
 				new("Encore un sous-menu", Encore),
@@ -124,7 +124,7 @@ namespace ConsoleMenu.ClassesIHM
 
 			Console.WriteLine("Chose !");
 
-			Menu(new("Retour", SousMenu));
+			Menu.Create(new("Retour", SousMenu));
 		}
 
 		private void Encore()
@@ -133,7 +133,7 @@ namespace ConsoleMenu.ClassesIHM
 
 			Console.WriteLine("Ok, on a compris.");
 
-			Menu(new Option[]
+			Menu.Create(new Option[]
 			{
 				new("Na !", Na),
 				new("Retour", SousMenu)
@@ -146,148 +146,7 @@ namespace ConsoleMenu.ClassesIHM
 
 			Console.WriteLine("Na !");
 
-			Menu(new("Retour", Encore));
-		}
-
-		#endregion
-
-
-
-		#region Menu controls
-
-		/// <summary>
-		/// Créer un menu avec une seule entrée.
-		/// </summary>
-		/// <param name="option">L'option pour cette entrée.</param>
-		private void Menu(Option option)
-		{
-			// Afficher le menu
-
-			Console.BackgroundColor = ConsoleColor.White;
-			Console.ForegroundColor = ConsoleColor.Black;
-			Console.WriteLine($"\n  {option.p_title} ");
-			Console.ResetColor();
-			Console.WriteLine("\n[ENTREE valider]");
-
-			ConsoleKey key = default;
-
-			while (key != ConsoleKey.Enter)
-			{
-				key = Console.ReadKey(true).Key;
-			}
-
-			// Ici, la key est Enter.
-
-			Console.Clear(); // Avant ce qui suit
-			option.p_action();
-		}
-
-		/// <summary>
-		/// Créer un menu à partir d'un tableau d'options.
-		/// <br/>La navigation réécrit le menu à la position du curseur à chaque fois.
-		/// <br/>La variable de suivi est réinitialisée.
-		/// </summary>
-		/// <param name="menuOptions">Tableau d'options.</param>
-		/// <param name="currentChoice">Variable (en référence), conservant l'index de l'option choisie.</param>
-		private void Menu(Option[] menuOptions, ref int currentChoice)
-		{
-			Menu(menuOptions, ref currentChoice, VarBehaviour.ResetValue);
-		}
-
-		/// <summary>
-		/// Créer un menu à partir d'un tableau d'options.
-		/// <br/>La navigation réécrit le menu à la position du curseur à chaque fois.
-		/// </summary>
-		/// <param name="menuOptions">Tableau d'options.</param>
-		/// <param name="currentChoice">Variable (en référence), conservant l'index de l'option choisie.</param
-		/// <param name="varBehaviour">Que faire avec la variable de suivi ? Conserver ou réinitialiser la valeur.</param>
-		private void Menu(Option[] menuOptions, ref int currentChoice, VarBehaviour varBehaviour)
-		{
-			while (true)
-			{
-				// Connaître la position du curseur (tuple)
-
-				(int Left, int Top) cursorStart = (Console.CursorLeft, Console.CursorTop);
-
-				// Afficher le menu
-
-				Console.WriteLine();
-
-				for (int i = 0; i < menuOptions.Length; i++)
-				{
-					if (i == currentChoice)
-					{
-						Console.BackgroundColor = ConsoleColor.White;
-						Console.ForegroundColor = ConsoleColor.Black;
-					}
-					else
-					{
-						Console.BackgroundColor = ConsoleColor.Black;
-						Console.ForegroundColor = ConsoleColor.White;
-					}
-					Console.WriteLine($"  {menuOptions[i].p_title} ");
-					Console.ResetColor();
-				}
-
-				Console.WriteLine("\n[HAUT/BAS naviguer] [ENTREE valider]");
-
-				// Choix utilisateur
-
-				ConsoleKey key = default;
-
-				while (key != ConsoleKey.Enter && key != ConsoleKey.UpArrow && key != ConsoleKey.DownArrow)
-				{
-					key = Console.ReadKey(true).Key;
-				}
-
-				// Ici, la key est l'une de celles autorisées.
-
-				if (key == ConsoleKey.DownArrow)
-				{
-					currentChoice++;
-				}
-				else if (key == ConsoleKey.UpArrow)
-				{
-					currentChoice--;
-				}
-				else if (key == ConsoleKey.Enter)
-				{
-					// Effacer (ici et pas après sinon non considéré)
-					Console.Clear();
-
-					switch (varBehaviour)
-					{
-						case VarBehaviour.KeepValue:
-							// Lancer l'action sans toucher à la variable (sa valeur est donc inchangée)
-							menuOptions[currentChoice].p_action();
-							break;
-						case VarBehaviour.ResetValue:
-						default:
-							// Conserver le choix utilisateur et réinitialiser ce dernier
-							int savedChoice = currentChoice;
-							currentChoice = 0;
-							// Lancer l'action avec le choix sauvegardé ici
-							menuOptions[savedChoice].p_action();
-							break;
-					}
-					
-					// Arrêter ici
-					break;
-				}
-
-				if (currentChoice < 0)
-				{
-					currentChoice = menuOptions.Length - 1;
-				}
-				else if (currentChoice > menuOptions.Length - 1)
-				{
-					currentChoice = 0;
-				}
-
-				// Réécriture à la position du curseur (et non Console.Clear())
-
-				Console.SetCursorPosition(cursorStart.Left, cursorStart.Top);
-			}
+			Menu.Create(new("Retour", Encore));
 		}
 
 		#endregion
